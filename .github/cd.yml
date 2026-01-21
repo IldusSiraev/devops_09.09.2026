@@ -5,7 +5,7 @@ on:
     branches: ["main"]
     tags:
       - "v*"
-  workflow_dispacth:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - names: Checout
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
@@ -33,65 +33,65 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Docker metadata (java)
+        id: meta_java
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/java-service
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
 
-     - name: Docker metadata (java)
-       id: meta_java
-       with:
-         images: ${{ env.IMAGE_PREFIX }}/java-service
-         tags: |
-           type=sha
-           type=raw,value-latest,enable={{is_default_branch}}
-           type=ref,event=tag
+      - name: Build & push (java)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./java-service
+          file: ./java-service/Dockerfile
+          push: true
+          tags: ${{ steps.meta_java.outputs.tags }}
+          labels: ${{ steps.meta_java.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-     - name: Build & push (java)
-       uses: docker/build-push-action@v6
-       with:
-         context: ./java-service
-         file: ./java-service/Dockerfile
-         push: true
-         tags: ${{ steps.meta_java.outputs.tags }}
-         labels: ${{ steps.meta_java.outputs.labels }}
-         cache-from: type=gha
-         cache-to: type=gha,mode=max
+      - name: Docker metadata (python)
+        id: meta_py
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/py-api
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
 
-     - name: Docker metadata (python)
-       id: meta_py
-       uses: docker/metadata-action@v5
-       with:
-         images: ${{ env.IMAGE_PREFIX }}/py-api
-         tags: |
-           type=sha
-           type=raw,value=latest,enable=((is_default_branch}}
-           type=ref,event=tag
+      - name: Build & push (python)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./python_backend
+          file: ./python_backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta_py.outputs.tags }}
+          labels: ${{ steps.meta_py.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-     - name: Build $ push (python)
-       uses: docker/build-push-action@v6
-       with:
-         context: ./python_backend
-         file: ./python_backend/Dockerfile
-         push: true
-         tags: $ {{ steps.meta_py.outputs.tags }}
-         labels: ${{ steps.meta_py.outputs.labels }}
-         cache-from: type=gha
-         cache-to: type=gha,mode=max
+      - name: Docker metadata (web)
+        id: meta_web
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/web
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
 
-     - name: Docker metadata (web)
-       id: meta_web
-       uses: docker/metadata-action@v5
-       with:
-         images: ${{ env.IMAGE_PREFIX }}/web
-         tags: |
-           type=sha
-           type=raw,value=latest,enable={{is_default_branch}}
-           type=ref,event=tag
-
-     - name: Build & push (web)
-       uses: docker/build-push-action@v6
-       with:
-         context: ./web
-         file: ./web/Dockerfile
-         push: true
-         tags: ${{ steps.meta_web.outputs.tags }}
-         labels: ${{ steps.meta_web.outputs.labels }}
-         cache-from: type=gha
-         cache-to: type=gha,mode=max
+      - name: Build & push (web)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./web
+          file: ./web/Dockerfile
+          push: true
+          tags: ${{ steps.meta_web.outputs.tags }}
+          labels: ${{ steps.meta_web.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
