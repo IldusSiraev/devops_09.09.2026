@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: testdb
+    ports:
+      - "3306:3306"
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./python_backend
+    container_name: flask_backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: nginx_frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  java-service:
+    build: ./java_backend
+    container_name: java_service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:

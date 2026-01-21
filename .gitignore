@@ -1,0 +1,23 @@
+# OS / Editor
+
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env.local
+
+#Java / Maven
+
+target/
+*.class
+*.jar
+
+# Docker
+**/.env

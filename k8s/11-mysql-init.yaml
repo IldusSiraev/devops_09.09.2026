@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init
+  namespace: demo
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS testdb;
+    USE testdb;
+    CREATE TABLE IF NOT EXISTS USERS(
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      name TEXT
+    );
