@@ -18,6 +18,5 @@ __pycache__/
 target/
 *.class
 *.jar
-
 # Docker
 **/.env
